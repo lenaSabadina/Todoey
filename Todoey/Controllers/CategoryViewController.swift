@@ -39,6 +39,14 @@ class CategoryViewController: UITableViewController {
         performSegue(withIdentifier: "goToItems", sender: self)
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! TodoListViewController
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categoryArray[indexPath.row]
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             context.delete(categoryArray[indexPath.row])
@@ -75,7 +83,7 @@ class CategoryViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Category", style: .default) { (action) in
             // What will happen once the user clicks the Add Category on our UIAlert
-            
+        
             let newCategory = Category(context: self.context)
             newCategory.name = textField.text!
             if newCategory.name!.count > 0 {
@@ -87,6 +95,8 @@ class CategoryViewController: UITableViewController {
             alertTextField.placeholder = "Create new category"
             textField = alertTextField
         }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) -> Void in
+        }))
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
