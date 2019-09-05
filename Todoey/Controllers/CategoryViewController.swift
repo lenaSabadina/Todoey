@@ -83,13 +83,17 @@ class CategoryViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Category", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Category", style: .default) { (action) in
             // What will happen once the user clicks the Add Category on our UIAlert
-        
+            guard let textfieldTitle = textField.text,
+                !textfieldTitle.isEmpty else {
+                    return
+            }
+            
             let newCategory = Category(context: self.context)
-            newCategory.name = textField.text!
-            if newCategory.name!.count > 0 {
+            newCategory.name = textfieldTitle
+            
             self.categoryArray.append(newCategory)
             self.saveCategories()
-            }
+            
         }
         alert.addTextField { (alertTextField) in   // adding the text field in the popup alert message
             alertTextField.placeholder = "Create new category"

@@ -23,7 +23,6 @@ class TodoListViewController: UITableViewController {
         super.viewDidLoad()
         
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
     }
     
     //MARK: TableView Datasource methods
@@ -73,15 +72,19 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // What will happen once the used clicks the Add Item on our UIAlert
             
+            guard let textfieldTitle = textField.text,
+                !textfieldTitle.isEmpty else {
+                return
+            }
+            
             let newItem = Item(context: self.context)
-            newItem.title = textField.text!
+            newItem.title = textfieldTitle
             newItem.done = false
             newItem.parentCategory = self.selectedCategory
             
-            if newItem.title!.count > 0 {
             self.itemArray.append(newItem)
             self.saveItems()
-                }
+            
         }
         alert.addTextField { (alertTextField) in   // adding the text field in the popup alert message
             alertTextField.placeholder = "Create new item"
@@ -103,8 +106,13 @@ class TodoListViewController: UITableViewController {
     }
     
     func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+        guard let categoryName = selectedCategory?.name
+            else {
+                print("Error, the category should have been defined")
+                return
+        }
         
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", categoryName)
         
         if let additionalPredicate = predicate {
             request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
@@ -126,15 +134,23 @@ class TodoListViewController: UITableViewController {
 extension TodoListViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let searchText = searchBar.text
+            else {
+                print("Error with seach bar text")
+                return
+        }
+        
         let request: NSFetchRequest<Item> = Item.fetchRequest()
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
         loadItems(with: request, predicate: predicate)
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
+        
+        if searchBar.text?.isEmpty == true {
             loadItems()
             // DispatchQueue method is setting the process to be done in the background
             DispatchQueue.main.async {
