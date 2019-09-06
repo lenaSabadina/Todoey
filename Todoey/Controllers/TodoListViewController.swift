@@ -13,6 +13,7 @@ class TodoListViewController: UITableViewController {
 
     var todoItems: Results<Item>?
     let realm = try! Realm()
+    
     var selectedCategory: Category? {
         didSet {
              loadItems()
@@ -87,6 +88,10 @@ class TodoListViewController: UITableViewController {
                     try self.realm.write {
                         let newItem = Item()
                         newItem.title = textfieldTitle
+                        newItem.dateCreated = Date()
+                      
+                    //    self.todoItems = self.selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: false)
+                        
                         currentCategory.items.append(newItem)
                     }
                 } catch {
@@ -109,35 +114,30 @@ class TodoListViewController: UITableViewController {
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
     }
-    
+}
 //MARK: - Search Bar methods
 
-//extension TodoListViewController: UISearchBarDelegate {
-//
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        guard let searchText = searchBar.text
-//            else {
-//                print("Error with seach bar text")
-//                return
-//        }
-//
-//        let request: NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
-//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//
-//        loadItems(with: request, predicate: predicate)
-//    }
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//
-//        if searchBar.text?.isEmpty == true {
-//            loadItems()
-//            // DispatchQueue method is setting the process to be done in the background
-//            DispatchQueue.main.async {
-//                searchBar.resignFirstResponder()
-//            }
-//        }
-//    }
+extension TodoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let searchText = searchBar.text
+            else {
+                print("Error with seach bar text")
+                return
+        }
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchText).sorted(byKeyPath: "dateCreated", ascending: true)
+        tableView.reloadData()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        if searchBar.text?.isEmpty == true {
+            loadItems()
+            // DispatchQueue method is setting the process to be done in the background
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
 }
 
