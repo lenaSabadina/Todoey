@@ -49,7 +49,7 @@ class TodoListViewController: UITableViewController {
         if let item = todoItems?[indexPath.row] {
             do {
                 try realm.write {
-                    item.done = !item.done
+                item.done = !item.done
                 }
             } catch {
                 print("Error saving the done status \(error)")
@@ -59,14 +59,16 @@ class TodoListViewController: UITableViewController {
         tableView.reloadData()
     }
     
-//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//            context.delete(todoItems[indexPath.row])
-//            self.todoItems.remove(at: indexPath.row)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
-//            saveItems()
-//        }
-//    }
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == UITableViewCell.EditingStyle.delete{
+            if let item = todoItems?[indexPath.row] {
+                try! realm.write {
+                    realm.delete(item)
+                }
+                tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
+            }
+        }
+    }
     
     //MARK: Add new items
     
@@ -102,11 +104,6 @@ class TodoListViewController: UITableViewController {
             alert.addAction(action)
             self.present(alert, animated: true, completion: nil)
     }
-    
-//    func saveItems() {
-//
-//        tableView.reloadData()
-//    }
     
     func loadItems() {
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
