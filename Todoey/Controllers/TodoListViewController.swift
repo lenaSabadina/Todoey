@@ -24,6 +24,7 @@ class TodoListViewController: UITableViewController {
         super.viewDidLoad()
         
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        self.todoItems = self.selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: false)
     }
     
     //MARK: TableView Datasource methods
@@ -89,8 +90,6 @@ class TodoListViewController: UITableViewController {
                         let newItem = Item()
                         newItem.title = textfieldTitle
                         newItem.dateCreated = Date()
-                      
-                    //    self.todoItems = self.selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: false)
                         
                         currentCategory.items.append(newItem)
                     }
