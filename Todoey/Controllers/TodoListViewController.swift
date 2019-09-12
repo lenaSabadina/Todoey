@@ -7,14 +7,30 @@
 //
 
 import UIKit
+import ChameleonFramework
 
 class TodoListViewController: UITableViewController {
 
     var database: Database = DatabaseManager()
+    @IBOutlet weak var searchBar: UISearchBar!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        tableView.separatorStyle = .none
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        if let colourHex = database.selectedCategory?.colour {
+            title = database.selectedCategory!.name
+            guard let navBar = navigationController?.navigationBar else {fatalError("Navigation Controller doesn't exist.")}
+            if let navBarColour = UIColor(hexString: colourHex) {
+                navBar.barTintColor = navBarColour
+                navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+                navBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColour, returnFlat: true)]
+                searchBar.barTintColor = navBarColour
+            }
+        }
     }
     
     //MARK: TableView Datasource methods
@@ -29,6 +45,10 @@ class TodoListViewController: UITableViewController {
         if let item = database.todoItems?[indexPath.row] {
         cell.textLabel?.text = item.title
         cell.accessoryType = item.done ? .checkmark : .none
+            if let colour = UIColor(hexString: database.selectedCategory!.colour)?.darken(byPercentage: CGFloat(indexPath.row)*0.4 / CGFloat(database.todoItems!.count)) {
+                cell.backgroundColor = colour
+                cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+            }
         } else {
             cell.textLabel?.text = "No Items added"
         }

@@ -16,7 +16,8 @@ class CategoryViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        database.loadCategories()
+        loadCategories()
+        tableView.separatorStyle = .none
     }
 
     // MARK: - Table view data source
@@ -26,9 +27,13 @@ class CategoryViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        cell.textLabel?.text = database.categories?[indexPath.row].name ?? "No Categories added yet"
         
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        if let category = database.categories?[indexPath.row] {
+            cell.textLabel?.text = category.name
+            cell.backgroundColor = UIColor(hexString: category.colour)
+            cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor ?? FlatWhite(), returnFlat: true)
+        }
         return cell
     }
     
@@ -79,7 +84,6 @@ class CategoryViewController: UITableViewController {
                     return
             }
             self.database.addCategory(name: textfieldTitle)
-            print(textfieldTitle)
             self.tableView.reloadData()
         }
         alert.addTextField { (alertTextField) in   // adding the text field in the popup alert message

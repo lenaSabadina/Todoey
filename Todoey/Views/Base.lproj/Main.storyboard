@@ -42,18 +42,20 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Item" id="8Y2-A8-R13">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="wRr-Yz-UG4">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
                                 <action selector="addButtonPressed:" destination="T7O-z9-0LY" id="CrM-id-mwk"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="searchBar" destination="1dc-64-UeV" id="C3c-rh-LLB"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4iw-hM-KK0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2467" y="147"/>
         </scene>
-        <!--Todoey-->
+        <!--Todo-->
         <scene sceneID="WlF-Bx-Sdu">
             <objects>
                 <tableViewController id="lWr-TH-E3X" customClass="CategoryViewController" customModule="Todoey" customModuleProvider="target" sceneMemberID="viewController">
@@ -76,9 +78,8 @@
                             <outlet property="delegate" destination="lWr-TH-E3X" id="KsH-Ds-6vN"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="Czp-tG-3tY">
+                    <navigationItem key="navigationItem" title="Todo" id="Czp-tG-3tY">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="bAD-u6-P9S">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
                                 <action selector="addButtonPressed:" destination="lWr-TH-E3X" id="2Sb-ke-OxC"/>
                             </connections>
@@ -100,7 +101,7 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Rhz-aE-bzq">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="barTintColor" red="0.22288346110000001" green="0.41230517449999998" blue="0.96993559600000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <color key="barTintColor" red="0.22352941176470587" green="0.41176470588235292" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <textAttributes key="titleTextAttributes">
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="textShadowColor" red="0.28237253429999998" green="0.2822774649" blue="0.28627571460000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
