@@ -7,36 +7,26 @@
 //
 
 import UIKit
-import RealmSwift
 
 class TodoListViewController: UITableViewController {
 
-    var todoItems: Results<Item>?
-    let realm = try! Realm()
-    
-    var selectedCategory: Category? {
-        didSet {
-             loadItems()
-        }
-    }
+    var database: Database = DatabaseManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        self.todoItems = self.selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: false)
     }
     
     //MARK: TableView Datasource methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return todoItems?.count ?? 1
+        return database.todoItems?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
         
-        if let item = todoItems?[indexPath.row] {
+        if let item = database.todoItems?[indexPath.row] {
         cell.textLabel?.text = item.title
         cell.accessoryType = item.done ? .checkmark : .none
         } else {
@@ -48,14 +38,8 @@ class TodoListViewController: UITableViewController {
     // MARK: TableView Delegate methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let item = todoItems?[indexPath.row] {
-            do {
-                try realm.write {
-                item.done = !item.done
-                }
-            } catch {
-                print("Error saving the done status \(error)")
-            }
+        if let item = database.todoItems?[indexPath.row] {
+            database.setCheckmark(item)
         }
         tableView.deselectRow(at: indexPath, animated: true)
         tableView.reloadData()
@@ -63,10 +47,8 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == UITableViewCell.EditingStyle.delete{
-            if let item = todoItems?[indexPath.row] {
-                try! realm.write {
-                    realm.delete(item)
-                }
+            if let item = database.todoItems?[indexPath.row] {
+                database.deleteItem(item)
                 tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
             }
         }
@@ -83,34 +65,21 @@ class TodoListViewController: UITableViewController {
                 !textfieldTitle.isEmpty else {
                     return
             }
-            
-            if let currentCategory = self.selectedCategory {
-                do {
-                    try self.realm.write {
-                        let newItem = Item()
-                        newItem.title = textfieldTitle
-                        newItem.dateCreated = Date()
-                        
-                        currentCategory.items.append(newItem)
-                    }
-                } catch {
-                    print("Error saving new items \(error)")
-                }
-                self.tableView.reloadData()
-            }
+            self.database.addItems(textfieldTitle)
+            self.tableView.reloadData()
         }
-            alert.addTextField { (alertTextField) in   // adding the text field in the popup alert message
-                alertTextField.placeholder = "Create new item"
-                textField = alertTextField
-            }
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) -> Void in
-            }))
-            alert.addAction(action)
-            self.present(alert, animated: true, completion: nil)
+        alert.addTextField { (alertTextField) in   // adding the text field in the popup alert message
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) -> Void in
+        }))
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
     }
     
     func loadItems() {
-        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+        database.loadItems()
         tableView.reloadData()
     }
 }
@@ -124,7 +93,7 @@ extension TodoListViewController: UISearchBarDelegate {
                 print("Error with seach bar text")
                 return
         }
-        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchText).sorted(byKeyPath: "dateCreated", ascending: true)
+        database.filterItems(searchText)
         tableView.reloadData()
     }
     

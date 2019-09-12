@@ -7,28 +7,28 @@
 //
 
 import UIKit
-import RealmSwift
+import ChameleonFramework
 
 class CategoryViewController: UITableViewController {
 
-    let realm = try! Realm()
-    var categories: Results<Category>?
+    var database: Database = DatabaseManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        loadCategories()
+        database.loadCategories()
     }
 
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories?.count ?? 1
+        return database.categories?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories added yet"
+        cell.textLabel?.text = database.categories?[indexPath.row].name ?? "No Categories added yet"
+        
         return cell
     }
     
@@ -42,16 +42,14 @@ class CategoryViewController: UITableViewController {
         let destinationVC = segue.destination as! TodoListViewController
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedCategory = categories?[indexPath.row]
+            destinationVC.database.selectedCategory = database.categories?[indexPath.row]
         }
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == UITableViewCell.EditingStyle.delete{
-            if let category = categories?[indexPath.row] {
-                try! realm.write {
-                    realm.delete(category)
-                }
+            if let category = database.categories?[indexPath.row] {
+                database.deleteCategory(category)
                 tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
             }
         }
@@ -60,20 +58,12 @@ class CategoryViewController: UITableViewController {
     // MARK: - Data manipulation
     
     func save(category: Category) {
-        do {
-            try realm.write {
-                realm.add(category)
-            }
-        } catch {
-            print("Error saving context \(error)")
-        }
+        database.saveCategory(category)
         self.tableView.reloadData()
     }
     
     func loadCategories() {
-        
-        categories = realm.objects(Category.self)
-        
+        database.loadCategories()
         tableView.reloadData()
     }
     
@@ -88,12 +78,9 @@ class CategoryViewController: UITableViewController {
                 !textfieldTitle.isEmpty else {
                     return
             }
-            
-            let newCategory = Category()
-            newCategory.name = textfieldTitle
-            
-            self.save(category: newCategory)
-            
+            self.database.addCategory(name: textfieldTitle)
+            print(textfieldTitle)
+            self.tableView.reloadData()
         }
         alert.addTextField { (alertTextField) in   // adding the text field in the popup alert message
             alertTextField.placeholder = "Create new category"
