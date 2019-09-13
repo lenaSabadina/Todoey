@@ -19,6 +19,11 @@ class CategoryViewController: UITableViewController {
         loadCategories()
         tableView.separatorStyle = .none
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        updateNavBar(colourHex: "3969F7")
+    }
 
     // MARK: - Table view data source
 

@@ -9,6 +9,17 @@
 import UIKit
 import ChameleonFramework
 
+extension UITableViewController {
+    
+    func updateNavBar(colourHex: String) {
+       guard let navBar = navigationController?.navigationBar else {fatalError("Navigation Controller doesn't exist.")}
+        guard let navBarColour = UIColor(hexString: colourHex) else {fatalError()}
+        navBar.barTintColor = navBarColour
+        navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+        navBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColour, returnFlat: true)]
+    }
+}
+
 class TodoListViewController: UITableViewController {
 
     var database: Database = DatabaseManager()
@@ -21,16 +32,10 @@ class TodoListViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        if let colourHex = database.selectedCategory?.colour {
-            title = database.selectedCategory!.name
-            guard let navBar = navigationController?.navigationBar else {fatalError("Navigation Controller doesn't exist.")}
-            if let navBarColour = UIColor(hexString: colourHex) {
-                navBar.barTintColor = navBarColour
-                navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
-                navBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColour, returnFlat: true)]
-                searchBar.barTintColor = navBarColour
-            }
-        }
+        title = database.selectedCategory?.name
+        guard let colourHex = database.selectedCategory?.colour else {fatalError()}
+        updateNavBar(colourHex: colourHex)
+        searchBar.barTintColor = UIColor(hexString: "colourHex")
     }
     
     //MARK: TableView Datasource methods
