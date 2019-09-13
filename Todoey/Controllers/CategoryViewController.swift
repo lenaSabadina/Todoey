@@ -20,7 +20,7 @@ class CategoryViewController: UITableViewController {
         tableView.separatorStyle = .none
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         updateNavBar(colourHex: "3969F7")
     }
